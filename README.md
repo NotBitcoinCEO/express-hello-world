@@ -1,36 +1,122 @@
-# Cyclic - Express Hello World
+# ChatGPT Twitch Bot
 
-This is a basic starter Expressjs app with:
+This is a simple Node.js Chat bot with ChatGPT Integration based on the simplest possible nodejs api using express that responds to any request with: Yo!
 
-- Static file hosting
-- Logging Middleware
-- Catch-all handler that echoes request info
+It considers a context file for every message so you can give it background information about your stream, your socials, your stream rewards, stream currency and so on. 
 
-## Local Quick Start
+You can choose if you want it to run in prompt mode (without context of previous messages) or in chat mode (with context of previous messages).
 
-- Clone to your local
-- Install dependencies `npm install`
-- Run locally `npm serve`
-- Make requests
-  - Browser: `http://localhost:3000/some/path?q=query+one&q=second+query&single=value`
-  - Command line: `curl -i -XGET "http://localhost:3000/cmd/line-curl"`
+# How to use
 
-## Deploy in under 10 seconds
+## 1. Fork this on Github
+Login with your github account and fork this repository to get your own copy of it. 
+
+---
+
+## 2. Fill out your context file
+Open the file file_context.txt and write down all your background information for GPT. 
+
+The contents of this file will be sent every time somebody enters your chat command. This will increase the cost of every request with every word you put in, but can still be pretty lengthy. 
+
+---
+
+## 3. Create an openAI account
+Go to https://platform.openai.com and create an account. 
+
+Initially you will get a free contingent to use but later on you will have to pay for the server usage. 
+
+You can set a spending limit here: https://platform.openai.com/account/billing/limits
+
+---
+
+## 4. Get your openAI Secure Key
+Go to https://platform.openai.com/account/api-keys
+
+Press "Create new secret key"
+
+Save that secret key somewhere safe. 
+
+You will use this key to authorize your version of this chatbot with openai. 
+<strong>Treat this as the key to your wallet.</strong>
+
+---
+
+## 5. Deploy this repo on Cyclic for free
+Press the button to deploy this on Cyclic.
 
 [![Deploy to Cyclic](https://deploy.cyclic.app/button.svg)](https://deploy.cyclic.app/)
-- Sets up instant continuous deployment on `git push`
-- Realtime backend logs and API request monitoring
 
-### Cyclic Runtime
+Log in with your Github account there and select your twitch-chatgpt repository for deployment. 
 
-- Cyclic hosts your app on serverless infrastructure. That means there is no guarantee of memory or file system persistence between requests.
-- The runtime expects a nodejs entry point defined as:
-  - package.json "main" field defines the entry point file (if missing uses index.js)
-  - Entry point starts a server on `process.env.PORT`
+The standard cyclic account is free to use and only very big streams will run into issues with their request contingent.
 
-## Say Hi
+---
 
-Ask a question or give us a shout out:
+## 6. Set your environment variables
+Go to the variables tab in your deployment. 
 
-- 💌 hello@cyclic.sh
-- 🐣 https://twitter.com/cyclicsoftware
+Create 3 new variables. The exact spelling of these variables is important:
+
+### GPT_MODE
+ ```
+Accepts one of 2 values:
+
+"CHAT" - Chat mode with history, cheaper then prompt mode but also faster. Uses gpt-3.5-turbo as model.
+
+"PROMPT" - Prompt mode, no history. Uses text-davinci-003 as model.
+```
+
+### HISTORY_LENGTH 
+```
+Only works when GPT_MODE is CHAT
+
+Accepts a number. 
+
+Defines how many bot-user conversations will be saved and sent together with the most recent user message. 
+
+This gives ChatGPT the ability to remember things and allow conversations instead of static prompts. 
+```
+
+### OPENAI_API_KEY
+```
+This is where you paste your openAI Secure Key. 
+```
+Save the Changes.
+
+---
+
+## 7. Get your API Link from Cyclic
+Copy the link cyclic provides for you. 
+
+You can find it in the top left corner below the title of your deployed repository.
+
+---
+
+## 8. Add your API Command to your Chatbot
+Now it is time to build your Chat-Command. 
+
+
+### Streamelements
+Go to your Streamelements Dashboard -> Chatbot -> Commands -> Custom Commands.
+
+Create a new command.
+
+Enter the following in the response field:
+```
+$(urlfetch https://your-cyclic-url.app/gpt/"${user}:${queryescape ${1:}}")
+```
+Replace "your-cyclic-url.app" with the url you copied in step 7
+
+Enjoy your command. 
+
+
+### Nightbot
+Go to your commands page and add a new command.
+
+Enter the following in the message field:
+```bash
+$(urlfetch https://your-cyclic-url.app/gpt/"$(user):$(querystring)")
+```
+Replace "your-cyclic-url.app" with the url you copied in step 7
+
+Enjoy your command. 
